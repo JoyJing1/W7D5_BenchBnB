@@ -21,7 +21,7 @@ const BenchIndex = React.createClass({
   render() {
     return(
       <div>
-        <h1>This is my bench.index.jsx file</h1>
+        <h1>The Best Benches in SF!</h1>
         {
           this.state.benches.map( bench => {
             return <BenchIndexItem bench={bench} key={bench.description}/>;

@@ -3,10 +3,9 @@ const ReactDOM = require('react-dom');
 const BenchStore = require('../stores/bench_store');
 const BenchActions = require('../actions/bench_actions');
 
-
 const BenchMap = React.createClass({
   getInitialState() {
-    return { benches: BenchStore.all() };
+    return { benches: BenchStore.all(), markers: {} };
   },
 
   componentDidMount(){
@@ -41,7 +40,30 @@ const BenchMap = React.createClass({
         bench.lng <= maxLng;
       });
 
+      // Remove old markers
+      let oldMarkers = this.state.markers;
+
+      Object.keys(oldMarkers).forEach(oldKey => {
+        const oldMarker = oldMarkers[oldKey];
+        const currLat = oldMarker.position.lat();
+        const currLng = oldMarker.position.lng();
+
+        if (currLat < minLat || currLat > maxLat || currLng < minLng || currLng > maxLng) {
+          oldMarker.setMap(null);
+        }
+      });
+
       this.setState({ benches: benches });
+
+      // Set new markers
+      let markers = {};
+
+      this.state.benches.forEach( bench => {
+        let marker = this._addBench(bench);
+        markers[(bench.description)] = marker;
+      });
+
+      this.setState({ markers: markers });
     }
   },
 
@@ -61,7 +83,6 @@ const BenchMap = React.createClass({
         southWest: {lat: fullBounds.getSouthWest().lat(), lng: fullBounds.getSouthWest().lng()}
       };
 
-      // console.log(bounds);
       BenchActions.fetchAllBenches(bounds);
     });
   },
@@ -72,17 +93,13 @@ const BenchMap = React.createClass({
         position: pos,
         map: this.map
       });
-    // console.log(pos);
+    return marker;
   },
 
   render() {
-    // this.state.benches.forEach( bench => {
-    //   this._addBench(bench);
-    // });
-
     return(
       <div className="map" ref="map">
-        <h1>Bench Map Here!</h1>
+        // <h1>Bench Map Here!</h1>
       </div>
     );
   }
