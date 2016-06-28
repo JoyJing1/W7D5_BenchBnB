@@ -3,29 +3,36 @@ const ReactDOM = require('react-dom');
 const ReactRouter = require('react-router');
 const Router = ReactRouter.Router;
 const Route = ReactRouter.Route;
+const IndexRoute = ReactRouter.IndexRoute;
 const hashHistory = ReactRouter.hashHistory;
 
 const Search = require('./components/search');
-window.BenchStore = require('./stores/bench_store');
-window.BenchIndex = require('./components/bench_index');
+const BenchForm = require('./components/bench_Form');
+// window.BenchStore = require('./stores/bench_store');
+// window.BenchIndex = require('./components/bench_index');
 
 const App = React.createClass({
   render() {
     return(
-      <h1>Welcome to the App!</h1>
+      <div>
+        <header><h1>Bench BnB</h1></header>
+        {this.props.children}
+      </div>
     );
   }
 });
 
-// const routes = (
-// const routes = (
-//   <Route path="/" component={App}>
-//
-//   </Route>
-// );
+const router = (
+  <Router history={hashHistory}>
+    <Route path="/" component={App}>
+      <IndexRoute component={Search}/>
+      <Route path="/benches/new" component={BenchForm}/>
+    </Route>
+  </Router>
+);
+
 
 document.addEventListener( "DOMContentLoaded", () => {
-  ReactDOM.render(
-    <Search/>,
-    document.getElementById("content"));
+  const root = document.getElementById('content');
+  ReactDOM.render(router, root);
 });

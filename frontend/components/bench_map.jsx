@@ -1,5 +1,6 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
+const hashHistory = require('react-router').hashHistory;
 const BenchStore = require('../stores/bench_store');
 const BenchActions = require('../actions/bench_actions');
 
@@ -16,12 +17,23 @@ const BenchMap = React.createClass({
     };
     this.map = new google.maps.Map(mapDOMNode, mapOptions);
 
-    BenchStore.addListener(this._onChange);
+    this.map.addListener('click', this._handleClick);
+
+    this.listener = BenchStore.addListener(this._updateBenchList);
     this.listenForMove();
   },
 
-  _onChange(){
-    this._updateBenchList();
+  componentWillUnmount() {
+    this.listener.remove();
+  },
+
+  _handleClick(e) {
+    const coords = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+
+    hashHistory.push({
+      pathname: "benches/new",
+      query: coords
+    });
   },
 
   _updateBenchList() {
@@ -71,19 +83,22 @@ const BenchMap = React.createClass({
     google.maps.event.addListener(this.map, 'idle', () => {
       const fullBounds = this.map.getBounds();
 
-      console.log('center');
-      console.log(fullBounds.getCenter().lat(), fullBounds.getCenter().lng());
-      console.log("north east");
-      console.log(fullBounds.getNorthEast().lat(), fullBounds.getNorthEast().lng());
-      console.log("south west");
-      console.log(fullBounds.getSouthWest().lat(), fullBounds.getSouthWest().lng());
+      // console.log('center');
+      // console.log(fullBounds.getCenter().lat(), fullBounds.getCenter().lng());
+      // console.log("north east");
+      // console.log(fullBounds.getNorthEast().lat(), fullBounds.getNorthEast().lng());
+      // console.log("south west");
+      // console.log(fullBounds.getSouthWest().lat(), fullBounds.getSouthWest().lng());
 
       const bounds = {
         northEast: {lat: fullBounds.getNorthEast().lat(), lng: fullBounds.getNorthEast().lng()},
         southWest: {lat: fullBounds.getSouthWest().lat(), lng: fullBounds.getSouthWest().lng()}
       };
 
-      BenchActions.fetchAllBenches(bounds);
+      console.log(bounds);
+      if (bounds) {
+        BenchActions.fetchAllBenches(bounds);
+      }
     });
   },
 
@@ -99,7 +114,6 @@ const BenchMap = React.createClass({
   render() {
     return(
       <div className="map" ref="map">
-        // <h1>Bench Map Here!</h1>
       </div>
     );
   }

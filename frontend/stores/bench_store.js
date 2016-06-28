@@ -11,7 +11,17 @@ BenchStore.__onDispatch = function(payload) {
     case BenchConstants.BENCHES_RECEIVED:
       resetAllBenches(payload.benches);
       break;
+    case BenchConstants.UPDATE_SINGLE_BENCH:
+      console.log('__onDispatch in BenchStore for UPDATE_SINGLE_BENCH');
+      this.updateBench(payload.bench);
+      this.__emitChange();
+      break;
   }
+};
+
+BenchStore.updateBench = function(bench) {
+  console.log("BenchStore.updateBench() in bench_store.js");
+  _benches[bench.id] = bench;
 };
 
 BenchStore.all = function() {
